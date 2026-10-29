@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3eee4">
+  <title>紙上交易室｜序列觀測站</title>
+  <link rel="stylesheet" href="/assets/paper.css?v=20261029-pixel-office-v64">
+  <script src="/assets/vendor/pixel-office/layout.js?v=20261029-pixel-office-v64" defer></script>
+  <script src="/assets/paper-motion.js?v=20261029-pixel-office-v64" defer></script>
+  <script src="/assets/vendor/pixel-office/office.js?v=20261029-pixel-office-v64" defer></script>
+  <script src="/assets/paper.js?v=20261029-pixel-office-v64" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">序列觀測站 <span>／ PAPER ROOM</span></a>
+    <a class="back-link" href="/">返回研究工作台</a>
+  </header>
+  <main>
+    <section class="room-heading">
+      <div>
+        <h1>紙上交易室</h1>
+        <p>一個帳戶一個座位。讓策略跟著新收盤日向前走，吉祥物會自行沿家具前方的走道往返。</p>
+      </div>
+      <div class="room-actions">
+        <button id="syncAll" class="sync-button" type="button"><svg class="sync-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.7-4L3 10m0-6v6h6M4 13a8 8 0 0 0 14.7 4L21 14m0 6v-6h-6"/></svg> 同步全室</button>
+        <button id="callMascot" class="call-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> 呼叫吉祥物</button>
+      </div>
+    </section>
+
+    <aside class="simulation-note">
+      <span class="note-led" aria-hidden="true"></span>
+      <p><strong>本機紙上模擬</strong> 沒有即時報價或券商連線；成交以新交易日收盤價與設定成本假設模擬，不代表可成交報價。</p>
+    </aside>
+
+    <section class="room-status" aria-label="交易室狀態">
+      <div><span>在席角色</span><strong id="activeCount">—</strong></div>
+      <div><span>退場角色</span><strong id="retiredCount">—</strong></div>
+      <div><span>座位使用</span><strong id="seatCapacity">—</strong></div>
+      <div class="room-message" id="roomMessage" role="status" aria-live="polite">房間已準備好，等候同步。</div>
+      <label class="seat-search"><span class="visually-hidden">搜尋角色或標的</span><input id="seatSearch" type="search" placeholder="找角色／標的" autocomplete="off"></label>
+    </section>
+    <div id="syncReport" class="sync-report" hidden aria-live="polite"></div>
+
+    <section class="office-stage" id="officeStage" aria-label="共用像素交易室">
+      <div class="room-sign">紙上交易室<br><small>MARKET SEQUENCE</small></div>
+      <div class="office-map" id="officeMap">
+        <div class="office-canvas-frame"><canvas id="officeCanvas" aria-hidden="true"></canvas></div>
+        <div id="officeLabels" aria-hidden="true"></div>
+        <div id="roomSeats" class="room-seats" aria-live="polite">
+          <div class="room-empty"><span class="empty-window" aria-hidden="true"></span><strong>房間裡還沒有吉祥物</strong><span>按「呼叫吉祥物」建立第一個模擬帳戶與座位。</span></div>
+        </div>
+      </div>
+      <div class="walkway-label"><span id="routeModelStatus" aria-live="polite">線上學習路線模型 · 已學 0 趟 · 64 條候選路線</span></div>
+      <div class="room-floor-label">LOCAL PAPER TRADING · NO BROKER ORDERS</div>
+    </section>
+
+    <section class="retired-section" id="retiredSection" hidden>
+      <div class="retired-heading"><div><h2>退場名冊</h2><p>停用後完成最後平倉的角色會在此休息；帳戶與每筆模擬紀錄仍可查閱。</p></div><span class="graveyard-mark" aria-hidden="true"></span></div>
+      <div id="retiredSeats" class="retired-seats"></div>
+    </section>
+
+    <section class="rules-strip" aria-label="模擬規則">
+      <div><span>訊號</span><strong>收盤後計算</strong><small>動能或凍結神經網路</small></div>
+      <div><span>模擬成交</span><strong>下一新交易日收盤</strong><small>套用手續費、稅與滑價</small></div>
+      <div><span>持倉</span><strong>只做多／空手</strong><small>整股與單一標的曝險上限</small></div>
+      <div><span>停止策略</span><strong>排定最後平倉</strong><small>完成後角色退場，歷史保留</small></div>
+    </section>
+    <footer><a href="/">回研究工作台</a><span>紙上模擬用於觀察策略，不是獲利證明或真實委託結果。</span></footer>
+  </main>
+
+  <dialog id="callDialog" class="side-dialog" aria-labelledby="callTitle">
+    <form id="accountForm" class="drawer-content">
+      <div class="drawer-top"><div><p class="drawer-kicker">NEW SEAT</p><h2 id="callTitle">呼叫一位吉祥物</h2></div><button class="icon-button" type="button" data-close="callDialog" aria-label="關閉設定">×</button></div>
+      <p class="drawer-intro">先替新夥伴選外觀，再設定它要觀察的紙上策略。送出後會新增一個帳戶與座位。</p>
+
+      <fieldset class="mascot-config"><legend>吉祥物造型</legend>
+        <div class="creation-mascot-preview mascot-teal accessory-cap" id="creationMascotPreview">
+          <span class="creation-mascot-avatar" id="creationMascotAvatar" role="img" aria-label="湖綠、經典鴨舌帽吉祥物預覽"></span>
+          <div class="creation-preview-copy">
+            <span class="creation-preview-kicker">外觀即時預覽</span>
+            <strong id="creationMascotName">新夥伴</strong>
+            <span id="creationMascotStyle">湖綠 · 經典鴨舌帽</span>
+            <span class="creation-preview-hint">顏色和帽型會立即更新</span>
+          </div>
+        </div>
+        <p class="visually-hidden" id="creationPreviewAnnouncement" aria-live="polite" aria-atomic="true">湖綠、新夥伴、經典鴨舌帽。</p>
+        <div class="mascot-create-fields">
+          <label class="field-label" for="nickname">暱稱</label><input id="nickname" maxlength="24" placeholder="例如：小雲" autocomplete="off">
+          <span class="field-label">顏色</span>
+          <div class="swatch-row" role="radiogroup" aria-label="選擇吉祥物顏色">
+            <label class="swatch-choice"><input type="radio" name="mascotColor" value="teal" checked><span class="swatch teal" aria-hidden="true"></span><span>湖綠</span></label>
+            <label class="swatch-choice"><input type="radio" name="mascotColor" value="red"><span class="swatch red" aria-hidden="true"></span><span>珊瑚</span></label>
+            <label class="swatch-choice"><input type="radio" name="mascotColor" value="blue"><span class="swatch blue" aria-hidden="true"></span><span>藍莓</span></label>
+            <label class="swatch-choice"><input type="radio" name="mascotColor" value="cream"><span class="swatch cream" aria-hidden="true"></span><span>奶油</span></label>
+          </div>
+          <label class="field-label" for="accessory">帽子造型</label><select id="accessory"><option value="cap">經典鴨舌帽</option><option value="beret">柔軟貝雷帽</option><option value="crown">小小皇冠</option><option value="none">不戴帽子</option></select>
+        </div>
+      </fieldset>
+
+      <div class="form-section"><h3>模擬策略</h3>
+        <label class="field-label" for="symbol">本機資料標的</label><select id="symbol" required><option value="TAIEX">載入標的…</option></select>
+        <label class="field-label" for="strategy">策略來源</label><select id="strategy"><option value="momentum">時間序列動能基準</option><option value="neural">研究工作台神經網路</option><option value="agent">訂閱代理（Codex／AGY）</option></select>
+        <div id="agentSettings" hidden>
+          <label class="field-label" for="agentProvider">代理客戶端</label><select id="agentProvider"><option value="codex">OpenAI Codex</option><option value="antigravity">Google Antigravity（AGY）</option></select>
+          <label class="agent-auto-choice"><input id="agentAutoEnabled" type="checkbox" checked><span><strong>允許代理自動提交紙上決策</strong><small>需在對應客戶端安裝本機 MCP 工具並設定排程；未輸入 API key。</small></span></label>
+          <p class="fineprint">代理只能提交 0% 至帳戶曝險上限的目標曝險。成交、整股、成本與帳本都由本機模擬引擎處理。</p>
+        </div>
+        <div id="neuralSettings" hidden>
+          <label class="field-label" for="model">已驗證模型</label><select id="model"><option>先選擇有最新驗證結果的標的</option></select>
+          <p id="modelInfo" class="fineprint">完成研究工作台驗證後，這裡會列出可用模型與資料版本。</p>
+          <div class="field-pair"><div><label class="field-label" for="buyThreshold">買進門檻（預測報酬）</label><input id="buyThreshold" type="number" step="0.0001" value="0.002"></div><div><label class="field-label" for="sellThreshold">退場門檻（預測報酬）</label><input id="sellThreshold" type="number" step="0.0001" value="-0.002"></div></div>
+        </div>
+        <div class="field-pair"><div><label class="field-label" for="capital">起始模擬資金（TWD）</label><input id="capital" type="number" min="1" max="100000000" step="1" value="100000" required></div><div><label class="field-label" for="lookback">動能回看交易日</label><input id="lookback" type="number" min="1" max="252" step="1" value="20" required></div></div>
+        <label class="field-label" for="maxExposure">單一標的曝險上限（%）</label><input id="maxExposure" type="number" min="1" max="100" step="1" value="20" required>
+        <details class="cost-settings"><summary>成本假設</summary><div class="field-triple"><div><label class="field-label" for="commission">手續費（bp）</label><input id="commission" type="number" min="0" max="500" step="0.25" value="14.25"></div><div><label class="field-label" for="sellTax">賣出稅（bp）</label><input id="sellTax" type="number" min="0" max="500" step="0.5" value="30"></div><div><label class="field-label" for="slippage">滑價（bp）</label><input id="slippage" type="number" min="0" max="500" step="1" value="10"></div></div></details>
+      </div>
+      <p id="formError" class="error" role="alert" hidden></p>
+      <p class="fineprint">策略與成本在第一次同步前固定於帳戶。神經網路帳戶需通過鎖定測試；AI 代理使用已登入的訂閱客戶端，此頁不會連接券商。</p>
+      <div class="drawer-footer"><button class="secondary-button" type="button" data-close="callDialog">先等等</button><button id="startAccount" class="primary-button" type="submit" disabled>建立帳戶並安排座位</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="inspectorDialog" class="side-dialog inspector-dialog" aria-labelledby="inspectorTitle">
+    <div class="drawer-content" id="inspectorContent"></div>
+  </dialog>
+</body>
+</html>

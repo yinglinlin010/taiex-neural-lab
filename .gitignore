@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/final-test-state.json
+data/final-test-state.tmp
+data/final-test-state-sequence-v1.json
+data/final-test-state-sequence-v1.tmp
+data/latest-validation-sequence-v1.json
+data/latest-validation-sequence-v1.tmp
+data/regression-monitor-state.json
+data/regression-monitor-sources.json
+data/regression-monitor.lock
+data/*.lock
+data/paper-trading.sqlite3*
+*.lock
+artifacts/regression-monitor/
+# Local results and account state
+/data/final-test-*.json
+/data/latest-validation-*.json
+/data/regression-monitor-*.json
+/data/paper-trading.sqlite3*
+/artifacts/

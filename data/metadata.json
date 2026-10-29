@@ -1,0 +1,18 @@
+{
+  "source": "TWSE local daily index snapshots with manual refresh from TWSE monthly history",
+  "sourceUrl": "https://www.twse.com.tw/indicesReport/MI_5MINS_HIST",
+  "retrievedAt": "2026-10-22T05:34:49.381995+00:00",
+  "rows": 4082,
+  "from": "2010-01-04",
+  "to": "2026-10-21",
+  "sha256": "4e14abffe434fef4df4ff37708ee307b91e04e3a49bd7f79c4993a8208ff41b6",
+  "fields": [
+    "date",
+    "close"
+  ],
+  "note": "本機歷史快照不含 TAIEX 日 OHLC；最新更新亦只合併收盤指數。",
+  "updatedRows": 1,
+  "refreshedMonths": [
+    "2026-10"
+  ]
+}

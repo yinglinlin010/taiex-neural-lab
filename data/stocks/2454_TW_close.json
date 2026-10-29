@@ -1,0 +1,15 @@
+{
+  "source": "TWSE STOCK_DAY monthly daily trading data",
+  "sourceUrl": "https://www.twse.com.tw/exchangeReport/STOCK_DAY",
+  "symbol": "2454.TW",
+  "retrievedAt": "2026-10-22T18:57:28.023345+00:00",
+  "rows": 1164,
+  "from": "2022-01-03",
+  "to": "2026-10-22",
+  "sha256": "8e4dfb9135aec284ba3587374dcc2c704477835f3e8f4eef334a2312746af0e4",
+  "fields": [
+    "date",
+    "close"
+  ],
+  "note": "使用 TWSE 日成交資料中的收盤價；不含 OHLC 與成交量。"
+}
